@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "database"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.scripts]
+build = "database.main:build"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+scrapy = "^2.12.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

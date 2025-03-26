@@ -11,6 +11,8 @@ build = "database.main:build"
 [tool.poetry.dependencies]
 python = "^3.11"
 scrapy = "^2.12.0"
+pandas = "^2.2.3"
+geopandas = "^1.0.1"
 
 
 [build-system]

@@ -37,39 +37,48 @@ class Sqlite3Exporter(BaseItemExporter):
         # Open the file as a sqlite3 database
         self.db = sqlite3.connect(file.name)
 
-    def start_exporting(self):
-        for ItemClass in EXPORTABLE_ITEMS:
-            table_description = get_table_description(ItemClass)
-            name = table_description["name"]
-            field_mappings = table_description["field_mappings"]
+        # Keep track of the tables we've prepared
+        self.tables_prepared = set()
 
-            # NOTE: We don't need to care about SQL injection here because
-            # we're in full control of the field names
-            columns = ", ".join(
-                f"{db_field} {db_type}"
-                for _, (db_field, db_type) in field_mappings.items()
+    def create_table_if_not_prepared(self, ItemClass):
+        if ItemClass in self.tables_prepared:
+            return
+        self.tables_prepared.add(ItemClass)
+
+        table_description = get_table_description(ItemClass)
+        name = table_description["name"]
+        field_mappings = table_description["field_mappings"]
+
+        # NOTE: We don't need to care about SQL injection here because
+        # we're in full control of the field names
+        columns = ", ".join(
+            f"{db_field} {db_type}"
+            for _, (db_field, db_type) in field_mappings.items()
+        )
+        self.db.execute(
+            f"""
+            DROP TABLE IF EXISTS {name}
+            """
+        )
+        self.db.execute(
+            f"""
+            CREATE TABLE {name} (
+                {columns}
             )
-            self.db.execute(
-                f"""
-                DROP TABLE IF EXISTS {name}
-                """
-            )
-            self.db.execute(
-                f"""
-                CREATE TABLE {name} (
-                    {columns}
-                )
-                """
-            )
+            """
+        )
 
     def finish_exporting(self):
         self.db.close()
 
     def export_item(self, item: Any) -> None:
-        if not item.__class__ in EXPORTABLE_ITEMS:
+        ItemClass = item.__class__
+        if not ItemClass in EXPORTABLE_ITEMS:
             raise ValueError(f"Item not supported by Sqlite3Exporter")
 
-        table_description = get_table_description(item.__class__)
+        self.create_table_if_not_prepared(ItemClass)
+
+        table_description = get_table_description(ItemClass)
         name = table_description["name"]
         field_mappings = table_description["field_mappings"]
 

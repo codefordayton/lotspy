@@ -33,6 +33,20 @@ test = ["anyio[trio]", "blockbuster (>=1.5.23)", "coverage[toml] (>=7)", "except
 trio = ["trio (>=0.26.1)"]
 
 [[package]]
+name = "asgi-cors"
+version = "1.0.1"
+description = "ASGI middleware for applying CORS headers to an ASGI application"
+optional = false
+python-versions = "*"
+files = [
+    {file = "asgi-cors-1.0.1.tar.gz", hash = "sha256:068a88c824c513573041a4e26b0c2801fcefefe6d59bb470d475a84f59fd498b"},
+    {file = "asgi_cors-1.0.1-py3-none-any.whl", hash = "sha256:075ee8359f2056ff8fa9d7751bdaeef30b40cf74040a25ffa3aaba61feca2c61"},
+]
+
+[package.extras]
+test = ["httpx", "pytest", "pytest-asyncio"]
+
+[[package]]
 name = "asgi-csrf"
 version = "0.11"
 description = "ASGI middleware for protecting against CSRF attacks"
@@ -446,6 +460,23 @@ uvicorn = ">=0.11"
 docs = ["blacken-docs", "codespell", "furo (==2024.8.6)", "sphinx-autobuild", "sphinx-copybutton"]
 rich = ["rich"]
 test = ["beautifulsoup4 (>=4.8.1)", "black (==24.4.2)", "blacken-docs (==1.12.1)", "cogapp (>=3.3.0)", "pytest (>=5.2.2)", "pytest-asyncio (>=0.17)", "pytest-timeout (>=1.4.2)", "pytest-xdist (>=2.2.1)", "trustme (>=0.7)"]
+
+[[package]]
+name = "datasette-cors"
+version = "1.0.1"
+description = "Datasette plugin for configuring CORS headers"
+optional = false
+python-versions = "*"
+files = [
+    {file = "datasette-cors-1.0.1.tar.gz", hash = "sha256:a676982c6d316258d634e1e2437ec842fe917be601468ea5a16ed8a6ef9a9182"},
+    {file = "datasette_cors-1.0.1-py3-none-any.whl", hash = "sha256:e5890293fd81c469672b9fb63958e094b10449b1f126a406ce4036640b57b040"},
+]
+
+[package.dependencies]
+asgi-cors = ">=1.0.1"
+
+[package.extras]
+test = ["datasette", "httpx", "pytest", "pytest-asyncio"]
 
 [[package]]
 name = "defusedxml"
@@ -1850,4 +1881,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "06a8b016a0ee0f7a24215a8583e7db6201101e4392db11c54fca2fb66d5f8f97"
+content-hash = "d2a25ad5604d041e15ced0906e71999a72faed80cb0e9b0b36db9836f3893da5"

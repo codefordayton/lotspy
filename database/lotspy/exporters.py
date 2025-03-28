@@ -5,9 +5,10 @@ from typing import Any, Type
 import scrapy
 from scrapy.exporters import BaseItemExporter
 
-from lotspy.items import NoorpItem
+from lotspy.items import NoorpItem, ParcelItem
 
 EXPORTABLE_ITEMS = [
+    ParcelItem,
     NoorpItem,
 ]
 

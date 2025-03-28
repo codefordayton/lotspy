@@ -11,6 +11,37 @@ class LotspyItem(scrapy.Item):
     # name = scrapy.Field()
     pass
 
+
+class ParcelItem(scrapy.Item):
+    """
+    A parcel
+
+    Available metadata:
+
+    - `db_field` - optional, the corresponding database table column name
+    - `db_type` - optional, the type of the column in the database table
+    """
+
+    db_table_name = "parcels"
+
+    parcel = scrapy.Field(
+        db_field="parcel_number",
+        db_type="TEXT",
+    )
+    longitude = scrapy.Field(
+        db_field="longitude",
+        db_type="REAL",
+    )
+    latitude = scrapy.Field(
+        db_field="latitude",
+        db_type="REAL",
+    )
+    address = scrapy.Field(
+        db_field="address",
+        db_type="TEXT",
+    )
+
+
 class NoorpItem(scrapy.Item):
     """
     A single Non Owner Occupied Rental Property item.

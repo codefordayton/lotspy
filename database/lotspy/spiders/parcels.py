@@ -8,6 +8,8 @@ import scrapy
 import scrapy.middleware
 from scrapy.utils.project import data_path
 
+from lotspy.items import ParcelItem
+
 
 class ParcelsSpider(scrapy.Spider):
     name = "parcels"
@@ -56,12 +58,12 @@ class ParcelsSpider(scrapy.Spider):
         centroid_gdf["latitude"] = centroid_gdf.geometry.y
 
         for _, row in centroid_gdf.iterrows():
-            yield {
-                "parcel": row.get("TAXPINNO"),
-                "longitude": row.get("longitude"),
-                "latitude": row.get("latitude"),
-                "address": create_full_address(row),
-            }
+            yield ParcelItem(
+                parcel=row["TAXPINNO"],
+                longitude=row["longitude"],
+                latitude=row["latitude"],
+                address=create_full_address(row),
+            )
 
 
 def create_full_address(row):

@@ -27,6 +27,8 @@ class NoorpItem(scrapy.Item):
     be exported to the database.
     """
 
+    db_table_name = "noorp"
+
     # define the fields for your item here like:
     tax_district = scrapy.Field(
         csv_source="TAX DISTRICT",

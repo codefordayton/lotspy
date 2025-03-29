@@ -36,6 +36,7 @@ class Sqlite3Exporter(BaseItemExporter):
 
         # Open the file as a sqlite3 database
         self.db = sqlite3.connect(file.name)
+        self.db.execute("PRAGMA synchronous=OFF")
 
         # Keep track of the tables we've prepared
         self.tables_prepared = set()
@@ -69,6 +70,7 @@ class Sqlite3Exporter(BaseItemExporter):
         )
 
     def finish_exporting(self):
+        self.db.commit()
         self.db.close()
 
     def export_item(self, item: Any) -> None:
@@ -95,5 +97,4 @@ class Sqlite3Exporter(BaseItemExporter):
         """
         values = tuple(item[field] for field in field_mappings)
 
-        with self.db:
-            self.db.execute(insert_query, values)
+        self.db.execute(insert_query, values)

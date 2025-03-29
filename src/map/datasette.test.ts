@@ -93,7 +93,7 @@ describe("useData", () => {
         query_ms: 0,
         truncated: false,
         ok: false,
-        error: "Internal Server Error",
+        error: "unknown column",
       } satisfies DatasetteSqlResponse);
 
     const { result } = renderHook(() => useData("select * from parcels"));
@@ -110,7 +110,7 @@ describe("useData", () => {
     expect(result.current).toMatchInlineSnapshot(`
       {
         "data": null,
-        "error": [Error: Error 500: Internal Server Error],
+        "error": [Error: Error 500: Internal Server Error - unknown column],
         "isLoading": false,
       }
     `);

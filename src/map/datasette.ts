@@ -84,11 +84,19 @@ export function useData<T extends Row>(
 
       try {
         const res = await fetch(url);
+        const json = await res.json();
+
         if (!res.ok) {
-          throw new Error(`Error ${res.status}: ${res.statusText}`);
+          let errorMessage = "Unknown error";
+          if ("error" in json) {
+            errorMessage = json.error;
+          }
+          throw new Error(
+            `Error ${res.status}: ${res.statusText} - ${errorMessage}`
+          );
         }
 
-        const data = (await res.json()) as DatasetteSqlResponse;
+        const data = json as DatasetteSqlResponse;
         if (!data.ok) {
           throw new Error(data.error);
         }
@@ -112,7 +120,7 @@ export function useData<T extends Row>(
 
         let cleanedError: Error;
         if (error instanceof Error) {
-          cleanedError = error
+          cleanedError = error;
         } else {
           cleanedError = new Error("Unknown error");
         }

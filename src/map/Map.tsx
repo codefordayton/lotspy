@@ -23,7 +23,7 @@ export function Map() {
   }>(`
     SELECT noorp.agent_name, parcels.longitude, parcels.latitude
     FROM noorp
-    JOIN parcels ON noorp.parcel = parcels.parcel_number
+    JOIN parcels ON noorp.parcel_number = parcels.parcel_number
   `);
 
   return (

@@ -23,22 +23,19 @@ class ParcelItem(scrapy.Item):
     """
 
     db_table_name = "parcels"
-    db_extra = """
-    CREATE UNIQUE INDEX IF NOT EXISTS parcels_parcel_number_idx
-    ON parcels (parcel_number);
-    """
+    db_extra = """"""
 
     parcel = scrapy.Field(
         db_field="parcel_number",
-        db_type="TEXT",
+        db_type="TEXT PRIMARY KEY",
     )
     longitude = scrapy.Field(
         db_field="longitude",
-        db_type="REAL",
+        db_type="REAL NOT NULL",
     )
     latitude = scrapy.Field(
         db_field="latitude",
-        db_type="REAL",
+        db_type="REAL NOT NULL",
     )
     address = scrapy.Field(
         db_field="address",
@@ -63,10 +60,7 @@ class NoorpItem(scrapy.Item):
     """
 
     db_table_name = "noorp"
-    db_extra = """"
-    CREATE UNIQUE INDEX IF NOT EXISTS noorp_parcel_idx
-    ON noorp (parcel);
-    """
+    db_extra = """"""
 
     # define the fields for your item here like:
     tax_district = scrapy.Field(
@@ -81,8 +75,8 @@ class NoorpItem(scrapy.Item):
     )
     parcel = scrapy.Field(
         csv_source="PARCEL",
-        db_field="parcel",
-        db_type="TEXT",
+        db_field="parcel_number",
+        db_type="TEXT PRIMARY KEY",
     )
     location = scrapy.Field(
         csv_source="LOCATION",

@@ -70,7 +70,7 @@ export function useData<T extends Row>(
   useEffect(() => {
     async function fetchData() {
       const url = new URL(`${getDatasetteUrl()}.json`);
-      url.searchParams.set("_sql", query);
+      url.searchParams.set("sql", query);
 
       for (const key in params) {
         url.searchParams.set(key, String(params[key]));

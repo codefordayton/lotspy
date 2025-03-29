@@ -19,7 +19,7 @@ describe("useData", () => {
     const scope = nock("https://datasette.example.com")
       .get("/lotspy.json")
       .query({
-        _sql: "select * from parcels limit :lim",
+        sql: "select * from parcels limit :lim",
         lim: 2,
       })
       .delay(10)
@@ -77,7 +77,7 @@ describe("useData", () => {
     const scope = nock("https://datasette.example.com")
       .get("/lotspy.json")
       .query({
-        _sql: "select * from parcels",
+        sql: "select * from parcels",
       })
       .reply(500, {
         database: "lotspy",
@@ -134,7 +134,7 @@ describe("useData", () => {
     expect(result.current).toMatchInlineSnapshot(`
       {
         "data": null,
-        "error": [NetConnectNotAllowedError: Nock: Disallowed net connect for "datasette.example.com:443/lotspy.json?_sql=select+*+from+parcels"],
+        "error": [NetConnectNotAllowedError: Nock: Disallowed net connect for "datasette.example.com:443/lotspy.json?sql=select+*+from+parcels"],
         "isLoading": false,
       }
     `);

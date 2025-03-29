@@ -23,6 +23,10 @@ class ParcelItem(scrapy.Item):
     """
 
     db_table_name = "parcels"
+    db_extra = """
+    CREATE UNIQUE INDEX IF NOT EXISTS parcels_parcel_number_idx
+    ON parcels (parcel_number);
+    """
 
     parcel = scrapy.Field(
         db_field="parcel_number",
@@ -59,6 +63,10 @@ class NoorpItem(scrapy.Item):
     """
 
     db_table_name = "noorp"
+    db_extra = """"
+    CREATE UNIQUE INDEX IF NOT EXISTS noorp_parcel_idx
+    ON noorp (parcel);
+    """
 
     # define the fields for your item here like:
     tax_district = scrapy.Field(

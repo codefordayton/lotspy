@@ -17,6 +17,7 @@ EXPORTABLE_ITEMS = [
 def get_table_description(ItemClass: Type[scrapy.Item]):
     return {
         "name": ItemClass.db_table_name,
+        "extra": getattr(ItemClass, "db_extra", None),
         "field_mappings": {
             field_name: (field_meta["db_field"], field_meta["db_type"])
             for field_name, field_meta in ItemClass.fields.items()
@@ -48,13 +49,13 @@ class Sqlite3Exporter(BaseItemExporter):
 
         table_description = get_table_description(ItemClass)
         name = table_description["name"]
+        extra = table_description["extra"]
         field_mappings = table_description["field_mappings"]
 
         # NOTE: We don't need to care about SQL injection here because
         # we're in full control of the field names
         columns = ", ".join(
-            f"{db_field} {db_type}"
-            for _, (db_field, db_type) in field_mappings.items()
+            f"{db_field} {db_type}" for _, (db_field, db_type) in field_mappings.items()
         )
         self.db.execute(
             f"""
@@ -68,6 +69,10 @@ class Sqlite3Exporter(BaseItemExporter):
             )
             """
         )
+        # Create any extra tables or indexes specified in the item
+        if extra:
+            self.db.execute(extra)
+        self.db.commit()
 
     def finish_exporting(self):
         self.db.commit()

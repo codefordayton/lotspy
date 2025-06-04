@@ -1,0 +1,11 @@
+{
+  "title": "Code for Dayton Datasette",
+  "description": "Some description text can go here",
+  "plugins": {
+    "datasette-cors": {
+      "host_wildcards": [
+        "http://localhost:*"
+      ]
+    }
+  }
+}

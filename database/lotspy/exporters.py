@@ -1,0 +1,105 @@
+from functools import lru_cache
+from io import BytesIO
+import sqlite3
+from typing import Any, Type
+import scrapy
+from scrapy.exporters import BaseItemExporter
+
+from lotspy.items import NoorpItem, ParcelItem
+
+EXPORTABLE_ITEMS = [
+    ParcelItem,
+    NoorpItem,
+]
+
+
+@lru_cache(maxsize=None)
+def get_table_description(ItemClass: Type[scrapy.Item]):
+    return {
+        "name": ItemClass.db_table_name,
+        "extra": getattr(ItemClass, "db_extra", None),
+        "field_mappings": {
+            field_name: (field_meta["db_field"], field_meta["db_type"])
+            for field_name, field_meta in ItemClass.fields.items()
+            if "db_field" in field_meta and "db_type" in field_meta
+        },
+    }
+
+
+class Sqlite3Exporter(BaseItemExporter):
+
+    def __init__(self, file: BytesIO, **kwargs: Any):
+        super().__init__(dont_fail=False, **kwargs)
+
+        # The file parameter is usually used in other exporters for writing directly,
+        # but sqlite3 needs to manage the file itself, so we'll close this handle
+        file.close()
+
+        # Open the file as a sqlite3 database
+        self.db = sqlite3.connect(file.name)
+        self.db.execute("PRAGMA synchronous=OFF")
+
+        # Keep track of the tables we've prepared
+        self.tables_prepared = set()
+
+    def create_table_if_not_prepared(self, ItemClass):
+        if ItemClass in self.tables_prepared:
+            return
+        self.tables_prepared.add(ItemClass)
+
+        table_description = get_table_description(ItemClass)
+        name = table_description["name"]
+        extra = table_description["extra"]
+        field_mappings = table_description["field_mappings"]
+
+        # NOTE: We don't need to care about SQL injection here because
+        # we're in full control of the field names
+        columns = ", ".join(
+            f"{db_field} {db_type}" for _, (db_field, db_type) in field_mappings.items()
+        )
+        self.db.execute(
+            f"""
+            DROP TABLE IF EXISTS {name}
+            """
+        )
+        self.db.execute(
+            f"""
+            CREATE TABLE {name} (
+                {columns}
+            )
+            """
+        )
+        # Create any extra tables or indexes specified in the item
+        if extra:
+            self.db.execute(extra)
+        self.db.commit()
+
+    def finish_exporting(self):
+        self.db.commit()
+        self.db.close()
+
+    def export_item(self, item: Any) -> None:
+        ItemClass = item.__class__
+        if not ItemClass in EXPORTABLE_ITEMS:
+            raise ValueError(f"Item not supported by Sqlite3Exporter")
+
+        self.create_table_if_not_prepared(ItemClass)
+
+        table_description = get_table_description(ItemClass)
+        name = table_description["name"]
+        field_mappings = table_description["field_mappings"]
+
+        # Dynamically generate the INSERT statement
+        # NOTE: We don't need to care about SQL injection with db_fields,
+        # because we're in full control of the field names.
+        # BUT! we do need to worry about SQL injection with the values,
+        # so we appropriately use ? placeholders and parameters
+        db_fields = ", ".join(db_field for _, (db_field, _) in field_mappings.items())
+        placeholders = ", ".join("?" for _ in field_mappings)
+        insert_query = f"""
+            INSERT INTO {name} ({db_fields})
+            VALUES ({placeholders})
+        """
+        values = tuple(item[field] for field in field_mappings)
+
+        self.db.execute(insert_query, values)
